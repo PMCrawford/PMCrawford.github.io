@@ -40,6 +40,33 @@
     </form>
   </div>
 
+  <div class="guestbook">
+    <h2>Guestbook</h2>
+    <form id="guestbook-form">
+      <input type="text" id="guestbook-name" placeholder="Your name (optional)" />
+      <select id="guestbook-emotion">
+        <option value="">Select your emotion</option>
+        <option>Happy</option><option>Sad</option><option>Excited</option><option>Angry</option><option>Relaxed</option>
+        <option>Anxious</option><option>Grateful</option><option>Lonely</option><option>Content</option><option>Inspired</option>
+        <option>Tired</option><option>Frustrated</option><option>Hopeful</option><option>Joyful</option><option>Bored</option>
+        <option>Motivated</option><option>Nostalgic</option><option>Peaceful</option><option>Curious</option><option>Overwhelmed</option>
+        <option>Energized</option><option>Embarrassed</option><option>Proud</option><option>Confused</option><option>Determined</option>
+        <option>Fearful</option><option>Optimistic</option><option>Amused</option><option>Resentful</option><option>Jealous</option>
+        <option>Surprised</option><option>Calm</option><option>Distracted</option><option>Shy</option><option>Guilty</option>
+        <option>Ashamed</option><option>Empowered</option><option>Humble</option><option>Worried</option><option>Annoyed</option>
+        <option>Insecure</option><option>Silly</option><option>Affectionate</option><option>Brave</option><option>Vindicated</option>
+        <option>Restless</option>
+      </select>
+      <textarea id="guestbook-entry" rows="4" placeholder="Leave a message..."></textarea>
+      <button type="submit">Sign Guestbook</button>
+    </form>
+    <div id="guestbook-messages" style="margin-top: 20px;"></div>
+    <div class="pagination">
+      <button id="prev-page">Previous</button>
+      <button id="next-page">Next</button>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
