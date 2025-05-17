@@ -116,3 +116,50 @@ button {
 button:hover {
   background-color: #333;
 }
+
+.guestbook {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  font-family: "Courier New", monospace;
+}
+
+.guestbook form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guestbook input,
+.guestbook select,
+.guestbook textarea {
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.guestbook button {
+  align-self: flex-end;
+  padding: 8px 12px;
+  font-size: 1em;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.guestbook button:hover {
+  background-color: #333;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
