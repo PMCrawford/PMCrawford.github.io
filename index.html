@@ -1,10 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>PMCrawford's Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three Column Layout</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .column {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .column {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is my simple site.</p>
+    <h1 style="text-align: center; margin-bottom: 30px;">Three Column Layout</h1>
+    
+    <div class="container">
+        <div class="column">
+            <h2>Column One</h2>
+            <p>This is the first column of your three-column layout. You can add any content you want here, such as text, images, or other HTML elements.</p>
+            <p>The columns will automatically adjust based on the screen size. On smaller screens, they will stack vertically.</p>
+        </div>
+        
+        <div class="column">
+            <h2>Column Two</h2>
+            <p>This is the second column of your layout. Each column takes up an equal amount of space in the container.</p>
+            <p>These columns use CSS flexbox for layout, which makes them flexible and responsive to different screen sizes.</p>
+        </div>
+        
+        <div class="column">
+            <h2>Column Three</h2>
+            <p>This is the third column of your layout. You can customize the colors, spacing, and other styles in the CSS section.</p>
+            <p>Feel free to edit this template to match your website's design and content needs.</p>
+        </div>
+    </div>
 </body>
 </html>
