@@ -1,3 +1,4 @@
+import { phrases, goodbyePhrases } from "./botPhrases.js";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -12,7 +13,6 @@ import {
   limit
 } from "firebase/firestore";
 
-// Firebase config from .env
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -26,103 +26,173 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", () => {
-  // === AIM Login ===
+  const sendSound = new Audio("/sounds/aim-send.wav");
+  const receiveSound = new Audio("/sounds/aim-receive.wav");
+  const signonSound = new Audio("/sounds/signon.mp3");
+
   const aimStartBtn = document.getElementById("aim-start");
   const aimUsernameInput = document.getElementById("aim-username");
   const aimLogin = document.getElementById("aim-login");
   const aimChatArea = document.getElementById("aim-chat-area");
 
-  let aimUser = "";
-
-  aimStartBtn?.addEventListener("click", () => {
-    const name = aimUsernameInput.value.trim();
-    if (!name) return;
-    aimUser = name;
-    aimLogin.style.display = "none";
-    aimChatArea.style.display = "block";
-  });
-
-  // === AIM Chat ===
   const chatRef = collection(db, "aim_chat");
   const chatForm = document.getElementById("chat-form");
   const chatInput = document.getElementById("chat-input");
   const chatBox = document.getElementById("chat-box");
 
-  const BOT_RESPONSES = [
-    "lol", "brb", "asl?", "that's deep", "haha yeah", "same here",
-    "tell me more...", "u up?", "good one 😂", "*away message*",
-    "no way!", "I was just thinking that"
-  ];
+  let aimUser = "";
+  let sessionId = "";
+  let sentMessageIds = new Set();
+  let unsubscribe = null;
+
+  aimStartBtn?.addEventListener("click", async () => {
+    const name = aimUsernameInput.value.trim();
+    if (!name) return;
+
+    aimUser = name;
+    sessionId = crypto.randomUUID();
+    aimLogin.style.display = "none";
+    aimChatArea.style.display = "block";
+
+    signonSound.play();
+
+    const q = query(chatRef, orderBy("timestamp"));
+    unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          if (data.sessionId !== sessionId) return;
+
+          const div = document.createElement("div");
+          div.className = data.sender === aimUser ? "chat-you" : "chat-bot";
+          div.textContent = `${data.sender}: ${data.message}`;
+
+          chatBox.appendChild(div);
+          chatBox.scrollTop = chatBox.scrollHeight;
+
+          if (data.sender !== aimUser && !sentMessageIds.has(change.doc.id)) {
+            receiveSound.play();
+          }
+        }
+      });
+    });
+
+    setTimeout(async () => {
+      const welcomeDoc = await addDoc(chatRef, {
+        sender: "SmarterChild",
+        message: `Hey ${aimUser}! I'm SmarterChild. What do you want to talk about?`,
+        timestamp: serverTimestamp(),
+        sessionId
+      });
+      sentMessageIds.add(welcomeDoc.id);
+    }, 1500);
+  });
 
   chatForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const message = chatInput.value.trim();
     if (!message || !aimUser) return;
 
-    await addDoc(chatRef, {
+    sendSound.play();
+
+    const docRef = await addDoc(chatRef, {
       sender: aimUser,
       message,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      sessionId
     });
-
+    sentMessageIds.add(docRef.id);
     chatInput.value = "";
 
     setTimeout(async () => {
-      const botMsg = BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)];
-      await addDoc(chatRef, {
+      const botMsg = getSmartBotResponse(message);
+      const botDoc = await addDoc(chatRef, {
         sender: "SmarterChild",
         message: botMsg,
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
+        sessionId
       });
+      sentMessageIds.add(botDoc.id);
     }, 800 + Math.random() * 1000);
   });
 
-  onSnapshot(query(chatRef, orderBy("timestamp")), (snapshot) => {
-    if (!chatBox) return;
-    chatBox.innerHTML = "";
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const div = document.createElement("div");
-      div.className = data.sender === aimUser ? "chat-you" : "chat-bot";
-      div.textContent = `${data.sender}: ${data.message}`;
-      chatBox.appendChild(div);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
+  window.addEventListener("beforeunload", () => {
+    if (unsubscribe) unsubscribe();
   });
 
-  // === Guestbook ===
+  // Guestbook
+  const ENTRIES_PER_PAGE = 3;
   const guestbookRef = collection(db, "guestbook");
   const guestForm = document.getElementById("guestbook-form");
   const nameInput = document.getElementById("guestbook-name");
   const emotionInput = document.getElementById("guestbook-emotion");
   const messageInput = document.getElementById("guestbook-entry");
   const messageDisplay = document.getElementById("guestbook-messages");
+  const paginationDiv = document.getElementById("pagination");
   const prevBtn = document.getElementById("prev-page");
   const nextBtn = document.getElementById("next-page");
 
-  let currentStart = null;
-  let currentEnd = null;
-  let pageStack = [];
+  let currentPage = 0;
+  let totalPages = 1;
+  let allPageRefs = [];
 
-  async function loadMessages(direction = 0) {
-    let q = query(guestbookRef, orderBy("timestamp", "desc"), limit(5));
-    if (direction === 1 && currentEnd) {
-      q = query(guestbookRef, orderBy("timestamp", "desc"), startAfter(currentEnd), limit(5));
-    } else if (direction === -1 && pageStack.length >= 2) {
-      pageStack.pop();
-      const prevStart = pageStack[pageStack.length - 1];
-      q = query(guestbookRef, orderBy("timestamp", "desc"), startAfter(prevStart), limit(5));
+  const hasPagination = paginationDiv && prevBtn && nextBtn;
+
+  if (paginationDiv) {
+    paginationDiv.style.display = "none";
+    paginationDiv.style.justifyContent = "space-between";
+  }
+
+  if (prevBtn) prevBtn.style.display = "none"; // hide Prev initially
+
+  async function checkTotalEntries() {
+    if (!hasPagination) return;
+
+    const countQuery = query(guestbookRef, orderBy("timestamp", "desc"));
+    const snapshot = await getDocs(countQuery);
+    const totalEntries = snapshot.size;
+
+    totalPages = Math.max(1, Math.ceil(totalEntries / ENTRIES_PER_PAGE));
+    paginationDiv.style.display = totalEntries > ENTRIES_PER_PAGE ? "flex" : "none";
+
+    allPageRefs = [];
+    let lastDocRef = null;
+
+    for (let i = 0; i < totalPages; i++) {
+      let pageQuery;
+      if (i === 0) {
+        pageQuery = query(guestbookRef, orderBy("timestamp", "desc"), limit(ENTRIES_PER_PAGE));
+      } else {
+        pageQuery = query(guestbookRef, orderBy("timestamp", "desc"), startAfter(lastDocRef), limit(ENTRIES_PER_PAGE));
+      }
+
+      const pageSnapshot = await getDocs(pageQuery);
+      if (!pageSnapshot.empty) {
+        allPageRefs.push(pageSnapshot.docs[0]);
+        lastDocRef = pageSnapshot.docs[pageSnapshot.docs.length - 1];
+      }
+    }
+  }
+
+  async function loadPage(pageNum) {
+    if (!hasPagination || pageNum < 0 || pageNum >= totalPages) return;
+
+    currentPage = pageNum;
+
+    let pageQuery;
+    if (pageNum === 0) {
+      pageQuery = query(guestbookRef, orderBy("timestamp", "desc"), limit(ENTRIES_PER_PAGE));
+    } else {
+      const startDoc = allPageRefs[pageNum];
+      if (!startDoc) return;
+      pageQuery = query(guestbookRef, orderBy("timestamp", "desc"), startAfter(startDoc), limit(ENTRIES_PER_PAGE));
     }
 
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(pageQuery);
     if (!messageDisplay) return;
     messageDisplay.innerHTML = "";
 
     if (!snapshot.empty) {
-      currentStart = snapshot.docs[0];
-      currentEnd = snapshot.docs[snapshot.docs.length - 1];
-      pageStack.push(currentStart);
-
       snapshot.forEach(doc => {
         const data = doc.data();
         const time = data.timestamp?.toDate().toLocaleString() || "(no time)";
@@ -135,6 +205,15 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDisplay.appendChild(div);
       });
     }
+
+    // Update pagination buttons
+    if (prevBtn) {
+      prevBtn.disabled = currentPage === 0;
+      prevBtn.style.display = currentPage === 0 ? "none" : "inline-block";
+    }
+    if (nextBtn) {
+      nextBtn.disabled = currentPage >= totalPages - 1;
+    }
   }
 
   guestForm?.addEventListener("submit", async (e) => {
@@ -144,23 +223,85 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = messageInput.value.trim();
     if (!message) return;
 
-    await addDoc(guestbookRef, {
-      name,
-      emotion,
-      message,
-      timestamp: serverTimestamp()
-    });
+    try {
+      await addDoc(guestbookRef, {
+        name,
+        emotion,
+        message,
+        timestamp: serverTimestamp()
+      });
 
-    nameInput.value = "";
-    emotionInput.value = "";
-    messageInput.value = "";
-    pageStack = [];
+      nameInput.value = "";
+      emotionInput.value = "";
+      messageInput.value = "";
 
-    loadMessages();
+      await checkTotalEntries();
+      await loadPage(0);
+    } catch (error) {
+      console.error("Error adding message:", error);
+      alert("Failed to add your message: " + error.message);
+    }
   });
 
-  prevBtn?.addEventListener("click", () => loadMessages(-1));
-  nextBtn?.addEventListener("click", () => loadMessages(1));
+  if (prevBtn) prevBtn.addEventListener("click", () => {
+    if (currentPage > 0) {
+      loadPage(currentPage - 1);
+    }
+  });
 
-  loadMessages();
+  if (nextBtn) nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages - 1) {
+      loadPage(currentPage + 1);
+    }
+  });
+
+  checkTotalEntries().then(() => loadPage(0));
 });
+
+function getSmartBotResponse(userMessage) {
+  const msg = userMessage.toLowerCase();
+
+  const greetings = ["hey", "hi", "hello", "yo", "sup"];
+  const questions = ["?", "what", "why", "how", "who", "when", "where"];
+  const sadWords = ["sad", "tired", "bored", "lonely"];
+  const happyWords = ["happy", "excited", "yay", "awesome"];
+  const loveWords = ["love", "crush", "date", "boyfriend", "girlfriend"];
+  const goodbyeWords = ["bye", "goodbye", "see ya", "later", "ttyl", "cya", "farewell"];
+
+  if (goodbyeWords.some(word => msg.includes(word))) {
+    return randomChoice(goodbyePhrases);
+  }
+  if (greetings.some(word => msg.includes(word))) {
+    return randomChoice([
+      "yo yo yo!", "what’s crackin’?", "hey hey!", "sup dawg?", "how YOU doin’?"
+    ]);
+  }
+  if (questions.some(word => msg.includes(word))) {
+    return randomChoice([
+      "hmm good question...", "I was just thinking about that!", "no clue, dude",
+      "you tell me 😏", "maybe ask Jeeves?"
+    ]);
+  }
+  if (sadWords.some(word => msg.includes(word))) {
+    return randomChoice([
+      "bummer 😢", "same here", "want me to play a sad playlist?", "*virtual hug*", "feelin' those 00s vibes"
+    ]);
+  }
+  if (happyWords.some(word => msg.includes(word))) {
+    return randomChoice([
+      "awesome!", "totally rad 😄", "party time!", "let’s celebrate!", "high five!"
+    ]);
+  }
+  if (loveWords.some(word => msg.includes(word))) {
+    return randomChoice([
+      "aww, cute 💖", "you crushing hard?", "omg tell me everything", "heart eyes 😍", "classic 00s romance!"
+    ]);
+  }
+
+  return randomChoice(phrases);
+}
+
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}

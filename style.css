@@ -77,21 +77,31 @@ img {
   overflow-y: auto;
   border: 1px solid #ddd;
   padding: 10px;
-  background: #f0f0f0;
+  background: #ffffff;
   margin-bottom: 10px;
 }
 
 .chat-you {
-  text-align: right;
-  color: blue;
-  margin: 5px 0;
+  font-family: "Courier New", monospace;
+  color: red;
+  font-weight: bold;
 }
 
 .chat-bot {
-  text-align: left;
-  color: green;
-  margin: 5px 0;
+  font-family: "Courier New", monospace;
+  color: blue;
+  font-weight: bold;
 }
+
+.chat-bubble {
+  background: #fff;
+  padding: 8px 12px;
+  margin: 6px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+
 
 input[type="text"] {
   width: 100%;
@@ -190,3 +200,7 @@ button:hover {
   border: 1px solid #aaa;
 }
 
+#chat-input {
+  background: #fff;
+  color: #000;
+}
