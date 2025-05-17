@@ -1,88 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phil's Corner</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            padding: 20px;
-            background-image: url('images/backgroundtile1.jpg'); 
-            background-repeat: repeat;
-            background-attachment: fixed;
-            background-size: auto;
-        }
-        
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .column {
-            flex: 1;
-            min-width: 250px;
-            padding: 20px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        h2 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        p {
-            margin-bottom: 15px;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .column {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phil's Corner</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      padding: 20px;
+      background-image: url('images/backgroundtile1.jpg');
+      background-repeat: repeat;
+      background-attachment: fixed;
+      background-size: auto;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 250px;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    p {
+      margin-bottom: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .column {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1 style="text-align: center; margin-bottom: 30px;">Welcome to Phil's Corner</h1>
-    
-    <div class="container">
-        <div class="column">
-            <h2>I like to read books</h2>
-            <p>Stephen King is the best!</p>
-            <img src="images/skeleton.gif" alt="Image for column one" class="column-image">
+  <h1 style="text-align: center; margin-bottom: 30px;">Welcome to Phil's Corner</h1>
 
-        </div>
-        
-        <div class="column">
-            <h2>I like to run and play tennis</h2>
-            <img src="images/federer.gif" alt="Image for column one" class="column-image">
-
-        </div>
-        
-        <div class="column">
-            <h2>I like to write</h2>
-            <p>I'm writing horror stories with my friend!</p>
-            <img src="images/book.gif" alt="Image for column one" class="column-image">
-        </div>
+  <div class="container">
+    <div class="column">
+      <h2>I like to read books</h2>
+      <p>Stephen King is the best!</p>
+      <img src="images/skeleton.gif" alt="Image for column one" class="column-image">
     </div>
-        <h1 style="text-align: center; margin-bottom: 30px;">I'm a wild and adventurous guy; who knows what I'll get up to next?</h1>
+
+    <div class="column">
+      <h2>I like to run and play tennis</h2>
+      <img src="images/federer.gif" alt="Image for column two" class="column-image">
+    </div>
+
+    <div class="column">
+      <h2>I like to write</h2>
+      <p>I'm writing horror stories with my friend!</p>
+      <img src="images/book.gif" alt="Image for column three" class="column-image">
+    </div>
+
+    <div class="column">
+      <h2>Guestbook</h2>
+      <form id="guestbook-form">
+        <textarea id="guestbook-entry" rows="4" placeholder="Leave a message..."></textarea>
+        <button type="submit">Sign Guestbook</button>
+      </form>
+      <div id="guestbook-messages" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+  <h1 style="text-align: center; margin-bottom: 30px;">I'm a wild and adventurous guy; who knows what I'll get up to next?</h1>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-witEf8tEuC5ZGOTlvX00QletwcVMl6g",
+      authDomain: "phils-corner.firebaseapp.com",
+      projectId: "phils-corner",
+      storageBucket: "phils-corner.firebasestorage.app",
+      messagingSenderId: "211606223114",
+      appId: "1:211606223114:web:8b63fb9e90fc4eaab662f3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messagesRef = collection(db, "guestbook");
+
+    const form = document.getElementById("guestbook-form");
+    const entry = document.getElementById("guestbook-entry");
+    const display = document.getElementById("guestbook-messages");
+
+    async function loadMessages() {
+      display.innerHTML = "";
+      const q = query(messagesRef, orderBy("timestamp", "desc"));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(doc => {
+        const p = document.createElement("p");
+        p.textContent = doc.data().message;
+        display.appendChild(p);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = entry.value.trim();
+      if (text) {
+        await addDoc(messagesRef, {
+          message: text,
+          timestamp: serverTimestamp()
+        });
+        entry.value = "";
+        loadMessages();
+      }
+    });
+
+    loadMessages();
+  </script>
 </body>
 </html>
