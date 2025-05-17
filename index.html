@@ -28,7 +28,7 @@
       gap: 20px;
       max-width: 1200px;
       margin: 0 auto;
-      margin-bottom: 60px; 
+      margin-bottom: 60px;
     }
 
     .column {
@@ -38,6 +38,7 @@
       background-color: #f5f5f5;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow: hidden;
     }
 
     h2 {
@@ -49,19 +50,36 @@
       margin-bottom: 15px;
     }
 
-    textarea {
+    textarea, input, select {
       width: 100%;
       padding: 10px;
-      resize: vertical;
+      margin-bottom: 10px;
     }
 
     button {
-      margin-top: 10px;
       padding: 8px 12px;
       cursor: pointer;
     }
 
-    /* Responsive adjustments */
+    .guestbook {
+      max-width: 700px;
+      margin: 40px auto 100px auto;
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .pagination {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    hr {
+      margin: 10px 0;
+    }
+
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
@@ -93,137 +111,128 @@
       <p>I'm writing horror stories with my friend!</p>
       <img src="images/book.gif" alt="Image for column three" class="column-image">
     </div>
-
-<div class="column">
-  <h2>Guestbook</h2>
-  <form id="guestbook-form">
-    <input type="text" id="guestbook-name" placeholder="Your name (optional)" style="width: 100%; margin-bottom: 10px;" />
-    
-    <select id="guestbook-emotion" style="width: 100%; margin-bottom: 10px;">
-      <option value="">Select your emotion</option>
-      <option>Happy</option>
-      <option>Sad</option>
-      <option>Excited</option>
-      <option>Angry</option>
-      <option>Relaxed</option>
-      <option>Anxious</option>
-      <option>Grateful</option>
-      <option>Lonely</option>
-      <option>Content</option>
-      <option>Inspired</option>
-      <option>Tired</option>
-      <option>Frustrated</option>
-      <option>Hopeful</option>
-      <option>Joyful</option>
-      <option>Bored</option>
-      <option>Motivated</option>
-      <option>Nostalgic</option>
-      <option>Peaceful</option>
-      <option>Curious</option>
-      <option>Overwhelmed</option>
-      <option>Energized</option>
-      <option>Embarrassed</option>
-      <option>Proud</option>
-      <option>Confused</option>
-      <option>Determined</option>
-      <option>Fearful</option>
-      <option>Optimistic</option>
-      <option>Amused</option>
-      <option>Resentful</option>
-      <option>Jealous</option>
-      <option>Surprised</option>
-      <option>Calm</option>
-      <option>Distracted</option>
-      <option>Shy</option>
-      <option>Guilty</option>
-      <option>Ashamed</option>
-      <option>Empowered</option>
-      <option>Humble</option>
-      <option>Worried</option>
-      <option>Annoyed</option>
-      <option>Determined</option>
-      <option>Insecure</option>
-      <option>Silly</option>
-      <option>Affectionate</option>
-      <option>Brave</option>
-      <option>Vindicated</option>
-      <option>Restless</option>
-    </select>
-    
-    <textarea id="guestbook-entry" rows="4" placeholder="Leave a message..." style="width: 100%;"></textarea>
-    <button type="submit" style="margin-top: 10px;">Sign Guestbook</button>
-  </form>
-  <div id="guestbook-messages" style="margin-top: 20px;"></div>
-</div>
-
+  </div>
 
   <h1 style="text-align: center; margin-bottom: 30px;">I'm a wild and adventurous guy; who knows what I'll get up to next?</h1>
 
-  <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div class="guestbook">
+    <h2>Guestbook</h2>
+    <form id="guestbook-form">
+      <input type="text" id="guestbook-name" placeholder="Your name (optional)" />
+      <select id="guestbook-emotion">
+        <option value="">Select your emotion</option>
+        <option>Happy</option><option>Sad</option><option>Excited</option><option>Angry</option><option>Relaxed</option>
+        <option>Anxious</option><option>Grateful</option><option>Lonely</option><option>Content</option><option>Inspired</option>
+        <option>Tired</option><option>Frustrated</option><option>Hopeful</option><option>Joyful</option><option>Bored</option>
+        <option>Motivated</option><option>Nostalgic</option><option>Peaceful</option><option>Curious</option><option>Overwhelmed</option>
+        <option>Energized</option><option>Embarrassed</option><option>Proud</option><option>Confused</option><option>Determined</option>
+        <option>Fearful</option><option>Optimistic</option><option>Amused</option><option>Resentful</option><option>Jealous</option>
+        <option>Surprised</option><option>Calm</option><option>Distracted</option><option>Shy</option><option>Guilty</option>
+        <option>Ashamed</option><option>Empowered</option><option>Humble</option><option>Worried</option><option>Annoyed</option>
+        <option>Insecure</option><option>Silly</option><option>Affectionate</option><option>Brave</option><option>Vindicated</option>
+        <option>Restless</option>
+      </select>
+      <textarea id="guestbook-entry" rows="4" placeholder="Leave a message..."></textarea>
+      <button type="submit">Sign Guestbook</button>
+    </form>
+    <div id="guestbook-messages" style="margin-top: 20px;"></div>
+    <div class="pagination">
+      <button id="prev-page">Previous</button>
+      <button id="next-page">Next</button>
+    </div>
+  </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-witEf8tEuC5ZGOTlvX00QletwcVMl6g",
-    authDomain: "phils-corner.firebaseapp.com",
-    projectId: "phils-corner",
-    storageBucket: "phils-corner.firebasestorage.app",
-    messagingSenderId: "211606223114",
-    appId: "1:211606223114:web:8b63fb9e90fc4eaab662f3"
-  };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, serverTimestamp,
+      query, orderBy, limit, startAfter, endBefore
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const messagesRef = collection(db, "guestbook");
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-witEf8tEuC5ZGOTlvX00QletwcVMl6g",
+      authDomain: "phils-corner.firebaseapp.com",
+      projectId: "phils-corner",
+      storageBucket: "phils-corner.firebasestorage.app",
+      messagingSenderId: "211606223114",
+      appId: "1:211606223114:web:8b63fb9e90fc4eaab662f3"
+    };
 
-  const form = document.getElementById("guestbook-form");
-  const nameInput = document.getElementById("guestbook-name");
-  const emotionInput = document.getElementById("guestbook-emotion");
-  const entryInput = document.getElementById("guestbook-entry");
-  const display = document.getElementById("guestbook-messages");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messagesRef = collection(db, "guestbook");
 
-  async function loadMessages() {
-    display.innerHTML = "";
-    const q = query(messagesRef, orderBy("timestamp", "desc"));
-    const snapshot = await getDocs(q);
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const div = document.createElement("div");
-      const time = data.timestamp?.toDate().toLocaleString() || "(no time)";
-      div.innerHTML = `
-        <p><strong>${data.name || "Anonymous"}</strong> (${data.emotion || "feeling...?"}) at ${time}:</p>
-        <p>${data.message}</p>
-        <hr style="margin: 10px 0;">
-      `;
-      display.appendChild(div);
+    const form = document.getElementById("guestbook-form");
+    const nameInput = document.getElementById("guestbook-name");
+    const emotionInput = document.getElementById("guestbook-emotion");
+    const entryInput = document.getElementById("guestbook-entry");
+    const display = document.getElementById("guestbook-messages");
+
+    const prevBtn = document.getElementById("prev-page");
+    const nextBtn = document.getElementById("next-page");
+
+    let currentStart = null;
+    let currentEnd = null;
+    let pageStack = [];
+
+    async function loadMessages(direction = 0) {
+      let q = query(messagesRef, orderBy("timestamp", "desc"), limit(5));
+      if (direction === 1 && currentEnd) {
+        q = query(messagesRef, orderBy("timestamp", "desc"), startAfter(currentEnd), limit(5));
+      } else if (direction === -1 && pageStack.length >= 2) {
+        pageStack.pop();
+        const prevStart = pageStack[pageStack.length - 1];
+        q = query(messagesRef, orderBy("timestamp", "desc"), startAfter(prevStart), limit(5));
+      }
+
+      const snapshot = await getDocs(q);
+      display.innerHTML = "";
+
+      if (!snapshot.empty) {
+        currentStart = snapshot.docs[0];
+        currentEnd = snapshot.docs[snapshot.docs.length - 1];
+        pageStack.push(currentStart);
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const time = data.timestamp?.toDate().toLocaleString() || "(no time)";
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <p><strong>${data.name || "Anonymous"}</strong> (${data.emotion || "feeling...?"}) at ${time}:</p>
+            <p>${data.message}</p>
+            <hr>
+          `;
+          display.appendChild(div);
+        });
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const emotion = emotionInput.value;
+      const message = entryInput.value.trim();
+      if (!message) return;
+
+      await addDoc(messagesRef, {
+        name,
+        emotion,
+        message,
+        timestamp: serverTimestamp()
+      });
+
+      nameInput.value = "";
+      emotionInput.value = "";
+      entryInput.value = "";
+
+      pageStack = []; // reset pagination
+      loadMessages();
     });
-  }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = nameInput.value.trim();
-    const emotion = emotionInput.value;
-    const message = entryInput.value.trim();
-
-    if (!message) return;
-
-    await addDoc(messagesRef, {
-      name,
-      emotion,
-      message,
-      timestamp: serverTimestamp()
-    });
-
-    nameInput.value = "";
-    emotionInput.value = "";
-    entryInput.value = "";
+    prevBtn.addEventListener("click", () => loadMessages(-1));
+    nextBtn.addEventListener("click", () => loadMessages(1));
 
     loadMessages();
-  });
-
-  loadMessages();
-</script>
-
+  </script>
 </body>
 </html>
