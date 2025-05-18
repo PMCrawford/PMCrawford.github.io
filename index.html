@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Phil's Corner</title>
+  <script type="module" crossorigin src="/assets/index-BWATYU1C.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BTnGyIAB.css">
+</head>
+<body>
+  <h1 style="text-align: center; margin-bottom: 30px;">Welcome to Phil's Corner</h1>
+
+  <div class="container">
+    <div class="column">
+      <h2>I like to read books</h2>
+      <p>Stephen King is the best!</p>
+      <img src="/assets/skeleton-C0hT4QCU.gif" alt="Image for column one" class="column-image">
+    </div>
+
+    <div class="column">
+      <h2>I like to run and play tennis</h2>
+      <p>Watch out for my backhand!</p>
+      <img src="/assets/federer-CIG5JAlP.gif" alt="Image for column two" class="column-image">
+    </div>
+
+    <div class="column">
+      <h2>I like to write</h2>
+      <p>I'm writing horror stories with my friend!</p>
+      <img src="/assets/book-Dff3e4BD.gif" alt="Image for column three" class="column-image">
+    </div>
+  </div>
+
+  <h1 style="text-align: center; margin-bottom: 30px;">I'm a wild and adventurous guy; who knows what I'll get up to next?</h1>
+
+  <div class="aim-chat" id="aim-wrapper">
+    <div id="aim-login">
+      <label for="aim-username">Your AIM username:</label>
+      <input type="text" id="aim-username" placeholder="e.g. PunkSkater99" />
+      <button id="aim-start">Start Chat</button>
+    </div>
+
+    <div id="aim-chat-area" style="display: none;">
+      <div class="aim-header">Chatting with <span class="smarterchild">SmarterChild</span></div>
+      <div id="chat-box" class="chat-box"></div>
+      <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="Say something to SmarterChild..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="guestbook">
+    <h2>Guestbook</h2>
+    <form id="guestbook-form">
+      <input type="text" id="guestbook-name" placeholder="Your name">
+      <select id="guestbook-emotion">
+        <option value="">Select your emotion</option>
+        <option>Happy</option><option>Sad</option><option>Excited</option><option>Angry</option><option>Relaxed</option>
+        <option>Anxious</option><option>Grateful</option><option>Lonely</option><option>Content</option><option>Inspired</option>
+        <option>Tired</option><option>Frustrated</option><option>Hopeful</option><option>Joyful</option><option>Bored</option>
+        <option>Motivated</option><option>Nostalgic</option><option>Peaceful</option><option>Curious</option><option>Overwhelmed</option>
+        <option>Energized</option><option>Embarrassed</option><option>Proud</option><option>Confused</option><option>Determined</option>
+        <option>Fearful</option><option>Optimistic</option><option>Amused</option><option>Resentful</option><option>Jealous</option>
+        <option>Surprised</option><option>Calm</option><option>Distracted</option><option>Shy</option><option>Guilty</option>
+        <option>Ashamed</option><option>Empowered</option><option>Humble</option><option>Worried</option><option>Annoyed</option>
+        <option>Insecure</option><option>Silly</option><option>Affectionate</option><option>Brave</option><option>Vindicated</option>
+        <option>Restless</option>
+      </select>
+      <textarea id="guestbook-entry" rows="3" placeholder="Leave a message..."></textarea>
+      <button type="submit">Sign Guestbook</button>
+    </form>
+    <div id="guestbook-messages"></div>
+    <div id="pagination" class="pagination" style="display: none;">
+      <button id="prev-page" disabled>Previous</button>
+      <button id="next-page" disabled>Next</button>
+    </div>
+  </div>
+
+</body>
+</html>
